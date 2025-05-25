@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Online Learning Platform</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    background: #f4f6f8;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  header {
+    background: #2a7ae2;
+    color: white;
+    padding: 1rem 2rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+  }
+  header .logo {
+    cursor: default;
+  }
+  header button {
+    background: #ff6f61;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+    transition: background-color 0.3s ease;
+  }
+  header button:hover {
+    background: #e65a4c;
+  }
+  main {
+    flex: 1;
+    display: flex;
+    padding: 1.5rem;
+    gap: 2rem;
+  }
+  .sidebar {
+    width: 280px;
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar h2 {
+    margin-top: 0;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: #2a7ae2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .lesson-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    flex: 1;
+    overflow-y: auto;
+  }
+  .lesson-list li {
+    padding: 0.7rem 1rem;
+    margin-bottom: 0.5rem;
+    background: #e7ecf8;
+    border-radius: 5px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .lesson-list li.completed {
+    background: #b6d4fe;
+    font-weight: 600;
+    color: #084298;
+  }
+  .lesson-list li:hover:not(.completed) {
+    background: #cfe2ff;
+  }
+  .lesson-list li.active {
+    background: #2a7ae2;
+    color: white;
+    font-weight: 700;
+  }
+  .lesson-list li .checkmark {
+    color: #198754;
+    font-size: 1.2rem;
+    user-select: none;
+  }
+  .content-area {
+    flex: 1;
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+  }
+  .video-container {
+    flex: 1;
+    margin-bottom: 1rem;
+  }
+  video {
+    width: 100%;
+    max-height: 400px;
+    border-radius: 8px;
+    background: black;
+  }
+  .quiz-container {
+    background: #f7f9fc;
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+    margin-top: 1rem;
+  }
+  .quiz-container h3 {
+    margin-top: 0;
+    color: #2a7ae2;
+  }
+  .quiz-question {
+    margin-bottom: 1rem;
+  }
+  .quiz-options {
+    list-style-type: none;
+    padding: 0;
+  }
+  .quiz-options li {
+    margin-bottom: 0.5rem;
+  }
+  .quiz-options input[type="radio"] {
+    margin-right: 10px;
+    accent-color: #2a7ae2;
+    cursor: pointer;
+  }
+  button.submit-quiz {
+    background: #2a7ae2;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    color: white;
+    font-weight: 600;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: background-color 0.3s ease;
+  }
+  button.submit-quiz:hover {
+    background: #195ec1;
+  }
+  button.retry-quiz {
+    background: #ff6f61;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    color: white;
+    font-weight: 600;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background-color 0.3s ease;
+  }
+  button.retry-quiz:hover {
+    background: #e14e50;
+  }
+
+  /* Authentication */
+  .auth-container {
+    max-width: 400px;
+    margin: 5rem auto;
+    background: white;
+    border-radius: 10px;
+    padding: 2rem 3rem;
+    box-shadow: 0 0 15px rgba(0,0,0,0.15);
+  }
+  .auth-container h2 {
+    margin-top: 0;
+    color: #2a7ae2;
+    text-align: center;
+  }
+  .auth-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .auth-container input[type="text"],
+  .auth-container input[type="password"] {
+    padding: 0.75rem 1rem;
+    border-radius: 5px;
+    border: 1.5px solid #ddd;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+  }
+  .auth-container input[type="text"]:focus,
+  .auth-container input[type="password"]:focus {
+    border-color: #2a7ae2;
+    outline: none;
+  }
+  .auth-container button {
+    background: #2a7ae2;
+    color: white;
+    font-weight: 700;
+    border: none;
+    padding: 0.8rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .auth-container button:hover {
+    background: #195ec1;
+  }
+  .auth-toggle {
+    text-align: center;
+    color: #555;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+  }
+  .auth-toggle button {
+    background: none;
+    border: none;
+    color: #2a7ae2;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .progress-summary {
+    margin-top: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #555;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    main {
+      flex-direction: column;
+      padding: 1rem;
+    }
+    .sidebar {
+      width: 100%;
+      flex-direction: row;
+      overflow-x: auto;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .lesson-list {
+      display: flex;
+      flex-direction: row;
+      gap: 0.5rem;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+    }
+    .lesson-list li {
+      flex: 0 0 auto;
+      min-width: 160px;
+      margin-bottom: 0;
+      text-align: center;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Online Learning Platform</div>
+  <div id="userPanel" style="display:none;">
+    <span id="welcomeUser"></span>
+    <button id="logoutBtn">Logout</button>
+  </div>
+</header>
+
+<main>
+  <!-- Authentication UI -->
+  <section id="authSection" class="auth-container" style="display:none;">
+    <h2 id="authTitle">Login</h2>
+    <form id="authForm">
+      <input type="text" id="usernameInput" placeholder="Username" required autocomplete="off" />
+      <input type="password" id="passwordInput" placeholder="Password" required autocomplete="off" />
+      <button type="submit" id="authSubmitBtn">Login</button>
+    </form>
+    <div class="auth-toggle">
+      <span id="toggleText">Don't have an account? </span>
+      <button id="toggleAuthBtn">Sign up</button>
+    </div>
+    <div id="authMessage" style="color:red; margin-top:10px;"></div>
+  </section>
+
+  <!-- Application UI -->
+  <section id="appSection" style="display:none; width:100%; display:flex; gap:1.5rem; flex-wrap: wrap;">
+    <aside class="sidebar">
+      <h2>Lessons <span id="progressPercent"></span></h2>
+      <ul id="lessonList" class="lesson-list"></ul>
+      <div class="progress-summary" id="progressSummary"></div>
+    </aside>
+    <section class="content-area" style="flex-grow:1; min-width:300px; display:flex; flex-direction: column;">
+      <div class="video-container">
+        <video id="lessonVideo" controls preload="metadata" poster="">
+          Sorry, your browser doesn't support embedded videos.
+        </video>
+      </div>
+      <div class="quiz-container" id="quizContainer" style="display:none;">
+        <h3>Quiz</h3>
+        <div id="quizQuestionContainer"></div>
+        <button class="submit-quiz" id="submitQuizBtn" disabled>Submit Answer</button>
+        <button class="retry-quiz" id="retryQuizBtn" style="display:none;">Retry Quiz</button>
+        <div id="quizResultMessage" style="margin-top:0.5rem; font-weight: 600;"></div>
+      </div>
+    </section>
+  </section>
+</main>
+
+<script>
+  (function(){
+    // Data definitions - quiz now as array of questions per lesson
+    const lessons = [
+      {
+        id: 'lesson1',
+        title: 'Introduction to Programming',
+        videoSrc: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm',
+        poster: 'https://i.imgur.com/FzYta6i.png',
+        quiz: [
+          {
+            question: 'What does CPU stand for?',
+            options: ['Central Processing Unit', 'Computer Personal Unit', 'Central Print Unit', 'Control Processing Unit'],
+            answerIndex: 0
+          },
+          {
+            question: 'Which language is primarily used for web development?',
+            options: ['Python', 'HTML', 'C++', 'Java'],
+            answerIndex: 1
+          },
+          {
+            question: 'What does RAM stand for?',
+            options: ['Random Access Memory', 'Readily Available Memory', 'Run All Memory', 'Random Ability Module'],
+            answerIndex: 0
+          }
+        ]
+      },
+      {
+        id: 'lesson2',
+        title: 'JavaScript Basics',
+        videoSrc: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/bee.webm',
+        poster: 'https://i.imgur.com/98HdB61.png',
+        quiz: [
+          {
+            question: 'Which symbol is used to declare a variable in JavaScript?',
+            options: ['var', 'let', 'const', 'All of the above'],
+            answerIndex: 3
+          },
+          {
+            question: 'JavaScript is primarily used for?',
+            options: ['Backend development', 'Frontend web development', 'Operating Systems', 'Game development'],
+            answerIndex: 1
+          },
+          {
+            question: 'Which method is used to add an event listener?',
+            options: ['addEvent', 'addListener', 'addEventListener', 'attachEvent'],
+            answerIndex: 2
+          }
+        ]
+      },
+      {
+        id: 'lesson3',
+        title: 'HTML Essentials',
+        videoSrc: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/bee.webm',
+        poster: 'https://i.imgur.com/4aOQZ6T.png',
+        quiz: [
+          {
+            question: 'What does HTML stand for?',
+            options: ['Hyper Text Markup Language', 'Home Tool Markup Language', 'Hyperlinks and Text Mark Language', 'Hyperlinking Text Marking Language'],
+            answerIndex: 0
+          },
+          {
+            question: 'Which tag is used to insert a line break?',
+            options: ['&lt;br&gt;', '&lt;break&gt;', '&lt;lb&gt;', '&lt;line&gt;'],
+            answerIndex: 0
+          },
+          {
+            question: 'What attribute is used for image source?',
+            options: ['href', 'src', 'link', 'alt'],
+            answerIndex: 1
+          }
+        ]
+      }
+    ];
+
+    // Elements references
+    const authSection = document.getElementById('authSection');
+    const appSection = document.getElementById('appSection');
+    const authTitle = document.getElementById('authTitle');
+    const authForm = document.getElementById('authForm');
+    const usernameInput = document.getElementById('usernameInput');
+    const passwordInput = document.getElementById('passwordInput');
+    const authSubmitBtn = document.getElementById('authSubmitBtn');
+    const toggleAuthBtn = document.getElementById('toggleAuthBtn');
+    const toggleText = document.getElementById('toggleText');
+    const authMessage = document.getElementById('authMessage');
+    const userPanel = document.getElementById('userPanel');
+    const welcomeUser = document.getElementById('welcomeUser');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    const lessonListElement = document.getElementById('lessonList');
+    const lessonVideo = document.getElementById('lessonVideo');
+    const quizContainer = document.getElementById('quizContainer');
+    const quizQuestionContainer = document.getElementById('quizQuestionContainer');
+    const submitQuizBtn = document.getElementById('submitQuizBtn');
+    const quizResultMessage = document.getElementById('quizResultMessage');
+    const retryQuizBtn = document.getElementById('retryQuizBtn');
+    const progressSummary = document.getElementById('progressSummary');
+    const progressPercent = document.getElementById('progressPercent');
+
+    // Authentication State
+    let isLoginMode = true; // toggle login/signup
+    let currentUser = null;
+    let currentLessonIndex = 0;
+    let quizQuestionIndex = 0; // current question in quiz
+    let selectedQuizOptionIndex = null;
+    let currentQuizScore = 0;
+    let quizFinished = false;
+
+    // LocalStorage keys
+    const USERS_KEY = 'olp_users';
+    const SESSION_KEY = 'olp_session';
+
+    // Util Helpers
+    function getUsers() {
+      try {
+        const users = JSON.parse(localStorage.getItem(USERS_KEY));
+        return users && typeof users === 'object' ? users : {};
+      } catch(e) {
+        return {};
+      }
+    }
+
+    function saveUsers(users) {
+      localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    }
+
+    function saveSession(user) {
+      localStorage.setItem(SESSION_KEY, user);
+    }
+
+    function clearSession() {
+      localStorage.removeItem(SESSION_KEY);
+    }
+
+    function getSession() {
+      return localStorage.getItem(SESSION_KEY);
+    }
+
+    function hashPassword(password) {
+      // Simple hash just for demonstration (not secure)
+      let hash = 0;
+      for(let i=0; i<password.length; i++) {
+        hash = ((hash << 5) - hash) + password.charCodeAt(i);
+        hash |= 0;
+      }
+      return hash.toString();
+    }
+
+    // User Data functions
+    function getUserData(username) {
+      const users = getUsers();
+      return users[username] || null;
+    }
+
+    function saveUserData(username, data) {
+      const users = getUsers();
+      users[username] = data;
+      saveUsers(users);
+    }
+
+    // Initialize app
+    function init() {
+      const loggedUser = getSession();
+      if (loggedUser && getUserData(loggedUser)) {
+        currentUser = loggedUser;
+        showAppUI();
+      } else {
+        showAuthUI();
+      }
+    }
+
+    // Show Auth UI
+    function showAuthUI() {
+      authSection.style.display = 'block';
+      appSection.style.display = 'none';
+      userPanel.style.display = 'none';
+      authMessage.textContent = '';
+      authForm.reset();
+      if (isLoginMode) {
+        authTitle.textContent = 'Login';
+        authSubmitBtn.textContent = 'Login';
+        toggleText.textContent = "Don't have an account? ";
+        toggleAuthBtn.textContent = 'Sign up';
+      } else {
+        authTitle.textContent = 'Sign Up';
+        authSubmitBtn.textContent = 'Create Account';
+        toggleText.textContent = "Already have an account? ";
+        toggleAuthBtn.textContent = 'Login';
+      }
+      quizFinished = false;
+    }
+
+    // Show Main App UI
+    function showAppUI() {
+      authSection.style.display = 'none';
+      appSection.style.display = 'flex';
+      userPanel.style.display = 'flex';
+      welcomeUser.textContent = 'Hello, ' + currentUser + '!';
+      currentLessonIndex = 0;
+      quizFinished = false;
+      currentQuizScore = 0;
+      quizQuestionIndex = 0;
+      renderLessonList();
+      loadLesson(currentLessonIndex);
+      updateProgressSummary();
+    }
+
+    // Toggle login/signup
+    toggleAuthBtn.addEventListener('click', () => {
+      isLoginMode = !isLoginMode;
+      showAuthUI();
+    });
+
+    // Authentication form submit
+    authForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      authMessage.textContent = '';
+      const username = usernameInput.value.trim().toLowerCase();
+      const password = passwordInput.value;
+
+      if (!username || !password) {
+        authMessage.textContent = 'Please enter username and password.';
+        return;
+      }
+      const users = getUsers();
+
+      if (isLoginMode) {
+        // Login flow
+        if (!users[username]) {
+          authMessage.textContent = 'User does not exist.';
+          return;
+        }
+        if (users[username].passwordHash !== hashPassword(password)) {
+          authMessage.textContent = 'Incorrect password.';
+          return;
+        }
+        currentUser = username;
+        saveSession(currentUser);
+        alert('Login successful. Welcome, ' + currentUser + '!');
+        showAppUI();
+      } else {
+        // Signup flow
+        if (users[username]) {
+          authMessage.textContent = 'Username already taken.';
+          return;
+        }
+        users[username] = {
+          passwordHash: hashPassword(password),
+          progress: {}
+        };
+        saveUsers(users);
+        currentUser = username;
+        saveSession(currentUser);
+        alert('Account created successfully. Welcome, ' + currentUser + '!');
+        showAppUI();
+      }
+    });
+
+    // Logout
+    logoutBtn.addEventListener('click', () => {
+      currentUser = null;
+      clearSession();
+      showAuthUI();
+    });
+
+    // Render lesson list
+    function renderLessonList() {
+      lessonListElement.innerHTML = '';
+      const userData = getUserData(currentUser);
+      lessons.forEach((lesson, index) => {
+        const li = document.createElement('li');
+        li.textContent = lesson.title;
+
+        // Add checkmark if completed
+        const checkSpan = document.createElement('span');
+        checkSpan.className = 'checkmark';
+        if (userData.progress && userData.progress[lesson.id] && userData.progress[lesson.id].completed) {
+          checkSpan.textContent = '✔';
+          li.classList.add('completed');
+        } else {
+          checkSpan.textContent = '';
+          li.classList.remove('completed');
+        }
+
+        if (index === currentLessonIndex) {
+          li.classList.add('active');
+        }
+
+        li.appendChild(checkSpan);
+
+        li.addEventListener('click', () => {
+          if (currentLessonIndex !== index) {
+            currentLessonIndex = index;
+            quizFinished = false;
+            currentQuizScore = 0;
+            quizQuestionIndex = 0;
+            loadLesson(index);
+            renderLessonList();
+          }
+        });
+        lessonListElement.appendChild(li);
+      });
+    }
+
+    // Load lesson video and initialize quiz question index etc.
+    function loadLesson(index) {
+      const lesson = lessons[index];
+      lessonVideo.pause();
+      lessonVideo.src = lesson.videoSrc;
+      lessonVideo.poster = lesson.poster;
+      lessonVideo.load();
+      currentQuizScore = 0;
+      quizQuestionIndex = 0;
+      quizFinished = false;
+      selectedQuizOptionIndex = null;
+      quizResultMessage.textContent = '';
+      retryQuizBtn.style.display = 'none';
+      submitQuizBtn.disabled = true;
+      renderQuizQuestion();
+    }
+
+    // Render current quiz question
+    function renderQuizQuestion() {
+      quizContainer.style.display = 'block';
+      const lesson = lessons[currentLessonIndex];
+      const quiz = lesson.quiz;
+
+      if (quizQuestionIndex >= quiz.length) {
+        // Quiz finished - show total score and prompt retry if less than 60
+        quizFinished = true;
+        const totalQuestions = quiz.length;
+        const percent = Math.round((currentQuizScore / totalQuestions) * 100);
+        quizQuestionContainer.innerHTML = `<div><strong>Quiz Complete!</strong></div>
+          <div>Your score: ${currentQuizScore} out of ${totalQuestions} (${percent}%).</div>`;
+        submitQuizBtn.style.display = 'none';
+
+        if (percent < 60) {
+          quizResultMessage.style.color = '#dc3545';
+          quizResultMessage.textContent = 'Your score is less than 60%. Please try again to improve!';
+          retryQuizBtn.style.display = 'inline-block';
+        } else {
+          quizResultMessage.style.color = '#198754';
+          quizResultMessage.textContent = 'Congratulations! You passed the quiz.';
+          retryQuizBtn.style.display = 'none';
+          // Save progress for passing quiz
+          saveLessonProgress(currentUser, lesson.id, true);
+          renderLessonList();
+          updateProgressSummary();
+        }
+        selectedQuizOptionIndex = null;
+        return;
+      }
+
+      const currentQuestion = quiz[quizQuestionIndex];
+      quizQuestionContainer.innerHTML = '';
+      const qDiv = document.createElement('div');
+      qDiv.className = 'quiz-question';
+      qDiv.textContent = `Q${quizQuestionIndex +1}: ${currentQuestion.question}`;
+      quizQuestionContainer.appendChild(qDiv);
+
+      const ul = document.createElement('ul');
+      ul.className = 'quiz-options';
+      currentQuestion.options.forEach((option, idx) => {
+        const li = document.createElement('li');
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.id = 'option' + idx;
+        input.name = 'quizOption';
+        input.value = idx;
+        input.addEventListener('change', () => {
+          selectedQuizOptionIndex = parseInt(input.value);
+          submitQuizBtn.disabled = false;
+          quizResultMessage.textContent = '';
+        });
+        const label = document.createElement('label');
+        label.htmlFor = input.id;
+        label.textContent = option;
+        li.appendChild(input);
+        li.appendChild(label);
+        ul.appendChild(li);
+      });
+      quizQuestionContainer.appendChild(ul);
+
+      submitQuizBtn.style.display = 'inline-block';
+      submitQuizBtn.disabled = true;
+      quizResultMessage.textContent = '';
+      retryQuizBtn.style.display = 'none';
+      selectedQuizOptionIndex = null;
+    }
+
+    // Submit quiz question answer handler
+    submitQuizBtn.addEventListener('click', () => {
+      if (selectedQuizOptionIndex === null) return;
+      const lesson = lessons[currentLessonIndex];
+      const currentQuestion = lesson.quiz[quizQuestionIndex];
+
+      const correct = selectedQuizOptionIndex === currentQuestion.answerIndex;
+      if (correct) {
+        currentQuizScore++;
+      }
+
+      quizResultMessage.style.color = correct ? '#198754' : '#dc3545';
+      quizResultMessage.textContent = correct ? 'Correct!' : 'Incorrect.';
+
+      quizQuestionIndex++;
+      selectedQuizOptionIndex = null;
+      submitQuizBtn.disabled = true;
+
+      // Small timeout before loading next question
+      setTimeout(() => {
+        renderQuizQuestion();
+      }, 1200);
+    });
+
+    // Retry Quiz button handler
+    retryQuizBtn.addEventListener('click', () => {
+      quizQuestionIndex = 0;
+      currentQuizScore = 0;
+      quizFinished = false;
+      retryQuizBtn.style.display = 'none';
+      quizResultMessage.textContent = '';
+      renderQuizQuestion();
+    });
+
+    // Save progress for a lesson for user when quiz passed
+    function saveLessonProgress(username, lessonId, quizPassed) {
+      const userData = getUserData(username) || {};
+      if (!userData.progress) {
+        userData.progress = {};
+      }
+      if (!userData.progress[lessonId]) {
+        userData.progress[lessonId] = { completed: false, quizPassed: false };
+      }
+
+      if (quizPassed) {
+        userData.progress[lessonId].completed = true;
+        userData.progress[lessonId].quizPassed = true;
+      }
+      saveUserData(username, userData);
+    }
+
+    // Render lesson list and update progress summary
+    function updateProgressSummary() {
+      const userData = getUserData(currentUser);
+      if (!userData || !userData.progress) {
+        progressSummary.textContent = 'No progress yet.';
+        progressPercent.textContent = '';
+        return;
+      }
+      let completedCount = 0;
+      lessons.forEach(lesson => {
+        if (userData.progress[lesson.id] && userData.progress[lesson.id].completed) {
+          completedCount++;
+        }
+      });
+      const percent = Math.round((completedCount / lessons.length) * 100);
+      progressSummary.textContent = `Completed ${completedCount} of ${lessons.length} lessons`;
+      progressPercent.textContent = `(${percent}%)`;
+    }
+
+    // Render lesson list with checkmark
+    function renderLessonList() {
+      lessonListElement.innerHTML = '';
+      const userData = getUserData(currentUser);
+      lessons.forEach((lesson, index) => {
+        const li = document.createElement('li');
+        li.textContent = lesson.title;
+
+        // Add checkmark if completed
+        const checkSpan = document.createElement('span');
+        checkSpan.className = 'checkmark';
+        if (userData.progress && userData.progress[lesson.id] && userData.progress[lesson.id].completed) {
+          checkSpan.textContent = '✔';
+          li.classList.add('completed');
+        } else {
+          checkSpan.textContent = '';
+          li.classList.remove('completed');
+        }
+
+        if (index === currentLessonIndex) {
+          li.classList.add('active');
+        }
+
+        li.appendChild(checkSpan);
+
+        li.addEventListener('click', () => {
+          if (currentLessonIndex !== index) {
+            currentLessonIndex = index;
+            quizFinished = false;
+            currentQuizScore = 0;
+            quizQuestionIndex = 0;
+            loadLesson(index);
+            renderLessonList();
+          }
+        });
+        lessonListElement.appendChild(li);
+      });
+    }
+
+    // Start app
+    init();
+  })();
+</script>
+</body>
+</html>
+
+
